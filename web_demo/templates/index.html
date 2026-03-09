@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SECA Evolution Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* -------------------------------------------------------------------------- */
+        /* Honeycomb Theme & Custom Cursor Styles */
+        /* -------------------------------------------------------------------------- */
+
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
+        /* Hide default cursor globally */
+        * {
+            cursor: none !important;
+        }
+
+        body {
+            font-family: 'Outfit', Arial, sans-serif;
+            margin: 0;
+            color: #f1f2f6;
+            /* Off-white text */
+            background-color: #0b0c10;
+            /* Very dark slate */
+            background-image:
+                radial-gradient(circle at center, rgba(255, 193, 7, 0.05) 0%, transparent 50%),
+                /* Pseudo Honeycomb Pattern */
+                linear-gradient(30deg, #1f2833 12%, transparent 12.5%, transparent 87%, #1f2833 87.5%, #1f2833),
+                linear-gradient(150deg, #1f2833 12%, transparent 12.5%, transparent 87%, #1f2833 87.5%, #1f2833),
+                linear-gradient(30deg, #1f2833 12%, transparent 12.5%, transparent 87%, #1f2833 87.5%, #1f2833),
+                linear-gradient(150deg, #1f2833 12%, transparent 12.5%, transparent 87%, #1f2833 87.5%, #1f2833),
+                linear-gradient(60deg, #171f28 25%, transparent 25.5%, transparent 75%, #171f28 75%, #171f28),
+                linear-gradient(60deg, #171f28 25%, transparent 25.5%, transparent 75%, #171f28 75%, #171f28);
+            background-size: 80px 140px;
+            background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
+        }
+
+        /* Custom Cursor Elements */
+        .cursor-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #ffc107;
+            border-radius: 50%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .cursor-trail {
+            width: 32px;
+            height: 32px;
+            border: 2px solid rgba(255, 193, 7, 0.4);
+            border-radius: 50%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9998;
+            transition: width 0.2s, height 0.2s, border-color 0.2s;
+        }
+
+        /* Cursor hover state for interactive elements */
+        a:hover~.cursor-trail,
+        button:hover~.cursor-trail {
+            width: 50px;
+            height: 50px;
+            border-color: rgba(255, 193, 7, 0.8);
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(31, 40, 51, 0.9), rgba(11, 12, 16, 0.9));
+            color: #ffc107;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 2px solid #ffc107;
+            backdrop-filter: blur(10px);
+        }
+
+        header h1 {
+            margin: 0;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        header p {
+            color: #c5c6c7;
+            font-weight: 300;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+        .card {
+            background: rgba(31, 40, 51, 0.7);
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 193, 7, 0.5);
+        }
+
+        .card h2 {
+            color: #ffc107;
+            border-bottom: 1px solid rgba(255, 193, 7, 0.2);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(31, 40, 51, 0.6) 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 193, 7, 0.15);
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .stat-box h3 {
+            color: #ffc107;
+            font-size: 2em;
+            margin: 10px 0;
+        }
+
+        .stat-box p {
+            color: #c5c6c7;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            letter-spacing: 1px;
+        }
+
+        button {
+            background: #ffc107;
+            color: #0b0c10;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: transparent;
+            color: #ffc107;
+            border: 2px solid #ffc107;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
+        }
+
+        .architecture {
+            font-family: 'Courier New', Courier, monospace;
+            background: rgba(11, 12, 16, 0.8);
+            color: #66fcf1;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+            white-space: pre-wrap;
+        }
+
+        .progress {
+            width: 100%;
+            background: rgba(11, 12, 16, 0.6);
+            height: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff8f00 0%, #ffc107 100%);
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+            transition: width 0.5s ease-out;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(11, 12, 16, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 193, 7, 0.1);
+        }
+
+        th {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 193, 7, 0.05);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #45a29e;
+            border-top: 1px solid rgba(69, 162, 158, 0.2);
+        }
+
+        /* Ensure mouse hovering over button triggers trail effect natively via JS below */
+    </style>
+</head>
+
+
+<body>
+
+    <!-- Custom Cursor HTML -->
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-trail" id="cursorTrail"></div>
+
+    <header>
+        <h1>SECA Dashboard</h1>
+        <p>Self-Evolving Cognitive Architecture</p>
+    </header>
+
+
+    <div class="container">
+
+        <div class="card">
+
+            <h2>Project Overview</h2>
+
+            <p>
+                SECA evolves neural network architectures using evolutionary algorithms
+                combined with gradient learning.
+            </p>
+
+            <button onclick="runSECA()">Run SECA Evolution</button>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Status</h2>
+            <div id="statusBox">Idle</div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Training Progress</h2>
+
+            <div id="progressDetails"
+                style="margin-bottom: 10px; color: #ffc107; font-weight: bold; display: flex; justify-content: space-between;">
+                <span id="genIndProgress">Waiting for evolution to start...</span>
+                <span id="timeRemaining"></span>
+            </div>
+
+            <div class="progress">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Experiment Statistics</h2>
+
+            <div class="stats">
+
+                <div class="stat-box">
+                    <h3 id="genCount">{{summary.generations}}</h3>
+                    <p>Generations</p>
+                </div>
+
+                <div class="stat-box">
+                    <h3 id="bestAccVal">{{summary.best_accuracy}}</h3>
+                    <p>Best Accuracy</p>
+                </div>
+
+                <div class="stat-box">
+                    <h3 id="bestFitVal">{{summary.best_fitness}}</h3>
+                    <p>Best Fitness</p>
+                </div>
+
+                <div class="stat-box">
+                    <h3 id="minParamVal">{{summary.min_parameters}}</h3>
+                    <p>Min Parameters</p>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Accuracy Evolution</h2>
+            <canvas id="accuracyChart"></canvas>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Fitness Evolution</h2>
+            <canvas id="fitnessChart"></canvas>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Model Size Evolution</h2>
+            <canvas id="paramChart"></canvas>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Evolution Table</h2>
+
+            <table id="genTable">
+
+                <tr>
+                    <th>Generation</th>
+                    <th>Accuracy</th>
+                    <th>Fitness</th>
+                    <th>Parameters</th>
+                </tr>
+
+            </table>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Best Architecture</h2>
+
+            <div id="architectureBox" class="architecture">
+                {{best_model.genome}}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <footer>
+        <p>SECA Research Prototype</p>
+    </footer>
+
+
+    <script>
+
+        const generations = JSON.parse('{{ generations | tojson | safe }}');
+        const accuracy = JSON.parse('{{ accuracy | tojson | safe }}');
+        const fitness = JSON.parse('{{ fitness | tojson | safe }}');
+        const params = JSON.parse('{{ params | tojson | safe }}');
+
+        // Honeycomb Theme Settings for ChartJs
+        Chart.defaults.color = '#c5c6c7';
+        Chart.defaults.borderColor = 'rgba(255, 193, 7, 0.1)';
+
+        let accuracyChart = new Chart(
+            document.getElementById("accuracyChart"),
+            {
+                type: 'line',
+                data: {
+                    labels: generations, datasets: [{
+                        label: 'Accuracy',
+                        data: accuracy,
+                        borderColor: '#ffc107',
+                        backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: '#ff8f00',
+                        pointRadius: 4
+                    }]
+                }
+            });
+
+        let fitnessChart = new Chart(
+            document.getElementById("fitnessChart"),
+            {
+                type: 'line',
+                data: {
+                    labels: generations, datasets: [{
+                        label: 'Fitness',
+                        data: fitness,
+                        borderColor: '#ff8f00',
+                        backgroundColor: 'rgba(255, 143, 0, 0.2)',
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: '#ffc107',
+                        pointRadius: 4
+                    }]
+                }
+            });
+
+        let paramChart = new Chart(
+            document.getElementById("paramChart"),
+            {
+                type: 'line',
+                data: {
+                    labels: generations, datasets: [{
+                        label: 'Parameters',
+                        data: params,
+                        borderColor: '#45a29e',
+                        backgroundColor: 'rgba(69, 162, 158, 0.2)',
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: '#66fcf1',
+                        pointRadius: 4
+                    }]
+                }
+            });
+
+        // --------------------------------------------------------------------------
+        // Custom Cursor Script Logic
+        // --------------------------------------------------------------------------
+        const cursorDot = document.getElementById("cursorDot");
+        const cursorTrail = document.getElementById("cursorTrail");
+
+        let mouseX = 0, mouseY = 0;
+        let trailX = 0, trailY = 0;
+
+        window.addEventListener("mousemove", (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // Dot follows exactly
+            cursorDot.style.left = mouseX + "px";
+            cursorDot.style.top = mouseY + "px";
+        });
+
+        // Animation loop to make trail lag behind slightly
+        function animateCursor() {
+            let distX = mouseX - trailX;
+            let distY = mouseY - trailY;
+
+            trailX = trailX + (distX * 0.2);
+            trailY = trailY + (distY * 0.2);
+
+            cursorTrail.style.left = trailX + "px";
+            cursorTrail.style.top = trailY + "px";
+
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Add hover scaling for all buttons and specific elements
+        const interactables = document.querySelectorAll('button, a');
+        interactables.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursorTrail.style.width = '50px';
+                cursorTrail.style.height = '50px';
+                cursorTrail.style.borderColor = 'rgba(255, 193, 7, 0.8)';
+                cursorTrail.style.background = 'rgba(255, 193, 7, 0.1)';
+                cursorDot.style.transform = 'translate(-50%, -50%) scale(1.5)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursorTrail.style.width = '32px';
+                cursorTrail.style.height = '32px';
+                cursorTrail.style.borderColor = 'rgba(255, 193, 7, 0.4)';
+                cursorTrail.style.background = 'transparent';
+                cursorDot.style.transform = 'translate(-50%, -50%) scale(1)';
+            });
+        });
+
+    </script>
+
+
+    <script>
+
+        let maxGenerations = 5;
+        let pollingInterval = null;
+
+        window.onload = () => {
+            updateDashboard();
+            if (!pollingInterval) {
+                pollingInterval = setInterval(updateDashboard, 2000);
+            }
+        };
+
+        function runSECA() {
+
+            document.getElementById("statusBox").innerText = "Running Evolution";
+
+            fetch("/run_seca");
+
+            if (!pollingInterval) {
+                pollingInterval = setInterval(updateDashboard, 2000);
+            }
+
+        }
+
+        function updateDashboard() {
+
+            fetch("/status")
+                .then(res => res.json())
+                .then(statusData => {
+                    if (!statusData.running) {
+                        document.getElementById("statusBox").innerText = "Idle";
+                        if (pollingInterval) {
+                            clearInterval(pollingInterval);
+                            pollingInterval = null;
+                        }
+                    } else {
+                        document.getElementById("statusBox").innerText = "Running Evolution";
+                        if (!pollingInterval) {
+                            pollingInterval = setInterval(updateDashboard, 2000);
+                        }
+                    }
+                });
+
+            fetch("/get_progress")
+                .then(res => res.json())
+                .then(data => {
+
+                    if (!data.results || data.results.length === 0 && data.generation === 0) return;
+
+                    updateCharts(data.results);
+                    updateTable(data.results);
+                    updateProgress(data);
+                    if (data.results.length > 0) {
+                        updateArchitecture(data.results);
+                        updateStats(data.results);
+                    }
+
+                });
+
+        }
+
+        function updateCharts(data) {
+
+            let gens = data.map(x => x.generation);
+            let acc = data.map(x => x.accuracy);
+            let fit = data.map(x => x.fitness);
+            let par = data.map(x => x.params);
+
+            accuracyChart.data.labels = gens;
+            accuracyChart.data.datasets[0].data = acc;
+            accuracyChart.update();
+
+            fitnessChart.data.labels = gens;
+            fitnessChart.data.datasets[0].data = fit;
+            fitnessChart.update();
+
+            paramChart.data.labels = gens;
+            paramChart.data.datasets[0].data = par;
+            paramChart.update();
+
+        }
+
+        function updateStats(data) {
+            let acc = data.map(x => x.accuracy);
+            let fit = data.map(x => x.fitness);
+            let par = data.map(x => x.params);
+
+            document.getElementById("genCount").innerText = data.length;
+            document.getElementById("bestAccVal").innerText = Math.max(...acc).toFixed(4);
+            document.getElementById("bestFitVal").innerText = Math.max(...fit).toFixed(4);
+            document.getElementById("minParamVal").innerText = Math.min(...par);
+        }
+
+        function updateTable(data) {
+
+            let table = document.getElementById("genTable");
+
+            table.innerHTML =
+                "<tr><th>Generation</th><th>Accuracy</th><th>Fitness</th><th>Parameters</th></tr>";
+
+            data.forEach(row => {
+
+                table.innerHTML +=
+                    `<tr>
+<td>${row.generation}</td>
+<td>${row.accuracy}</td>
+<td>${row.fitness}</td>
+<td>${row.params}</td>
+</tr>`;
+
+            });
+
+        }
+
+        function updateProgress(data) {
+
+            let progress = 0;
+            let label = "Waiting for evolution to start...";
+            let timeLabel = "";
+
+            if (data.total_individuals > 0) {
+                // Calculate progress based on individuals (generation * pop_size + individual)
+                // Since we don't have pop_size explicitly, we estimate based on total_individuals and maxGenerations if needed,
+                // but it's better to just use (completed_generations * estimated_pop_size + current_individual) / total_individuals
+
+                let completed_generations = data.results.length;
+                let active_generation = data.generation;
+                let active_individual = data.individual;
+
+                // Use the total_individuals for a smooth progress bar
+                let pop_size = data.total_individuals / (maxGenerations || 1); // fallback
+                if (data.results && data.results.length > 0 && data.generation > data.results.length) {
+                    pop_size = data.total_individuals / data.generation; // roughly
+                }
+
+                // A more robust way since we have total_individuals
+                let current_total_individuals = ((data.generation - 1) * (data.total_individuals / maxGenerations)) + data.individual;
+                // If it's done or using the legacy fallback where generation == maxGenerations
+                if (data.generation >= maxGenerations && data.individual === 0) {
+                    current_total_individuals = data.total_individuals;
+                }
+
+                progress = (current_total_individuals / data.total_individuals) * 100;
+
+                if (progress > 100) progress = 100;
+                if (isNaN(progress)) progress = 0;
+
+                label = `Gen: ${data.generation} | Ind: ${data.individual}`;
+
+                if (data.estimated_remaining_seconds > 0) {
+                    let m = Math.floor(data.estimated_remaining_seconds / 60);
+                    let s = data.estimated_remaining_seconds % 60;
+                    timeLabel = `Time Remaining: ${m}m ${s}s`;
+                } else if (progress >= 100) {
+                    timeLabel = "Completed";
+                    label = `Gen: ${data.generation} | Done`;
+                } else {
+                    timeLabel = "Calculating...";
+                }
+            } else {
+                // Fallback for old format or empty
+                progress = (data.results.length / maxGenerations) * 100;
+            }
+
+            document.getElementById("progressBar").style.width = progress + "%";
+            document.getElementById("genIndProgress").innerText = label;
+            document.getElementById("timeRemaining").innerText = timeLabel;
+
+        }
+
+        function updateArchitecture(data) {
+
+            let last = data[data.length - 1];
+
+            document.getElementById("architectureBox").innerText =
+                JSON.stringify(last.genome, null, 2);
+
+        }
+
+    </script>
+
+</body>
+
+</html>

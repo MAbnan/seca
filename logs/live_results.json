@@ -1,0 +1,183 @@
+{
+    "generation": 5,
+    "individual": 6,
+    "total_individuals": 30,
+    "estimated_remaining_seconds": 0,
+    "results": [
+        {
+            "generation": 0,
+            "accuracy": 0.9866999983787537,
+            "fitness": 0.8642739983787536,
+            "params": 122426,
+            "genome": {
+                "dense": 64,
+                "dropout": 0.4,
+                "stages": [
+                    {
+                        "filters": 16,
+                        "kernel": 3,
+                        "pool": 1
+                    },
+                    {
+                        "filters": 48,
+                        "kernel": 3,
+                        "pool": 2
+                    },
+                    {
+                        "filters": 32,
+                        "kernel": 3,
+                        "pool": 2
+                    }
+                ]
+            }
+        },
+        {
+            "generation": 1,
+            "accuracy": 0.9868000149726868,
+            "fitness": 0.9363260149726867,
+            "params": 50474,
+            "genome": {
+                "dense": 64,
+                "dropout": 0.4,
+                "stages": [
+                    {
+                        "filters": 64,
+                        "kernel": 3,
+                        "pool": 2
+                    },
+                    {
+                        "filters": 16,
+                        "kernel": 3,
+                        "pool": 1
+                    },
+                    {
+                        "filters": 48,
+                        "kernel": 3,
+                        "pool": 2
+                    },
+                    {
+                        "filters": 32,
+                        "kernel": 3,
+                        "pool": 2
+                    }
+                ]
+            }
+        },
+        {
+            "generation": 2,
+            "accuracy": 0.9912999868392944,
+            "fitness": 0.9408259868392944,
+            "params": 50474,
+            "genome": {
+                "dense": 64,
+                "dropout": 0.4,
+                "stages": [
+                    {
+                        "filters": 64,
+                        "kernel": 3,
+                        "pool": 2
+                    },
+                    {
+                        "filters": 16,
+                        "kernel": 3,
+                        "pool": 1
+                    },
+                    {
+                        "filters": 48,
+                        "kernel": 3,
+                        "pool": 2
+                    },
+                    {
+                        "filters": 32,
+                        "kernel": 3,
+                        "pool": 2
+                    }
+                ]
+            }
+        },
+        {
+            "generation": 3,
+            "accuracy": 0.9894999861717224,
+            "fitness": 0.9436499861717225,
+            "params": 45850,
+            "genome": {
+                "dense": 64,
+                "dropout": 0.4,
+                "stages": [
+                    {
+                        "filters": 64,
+                        "kernel": 3,
+                        "pool": 2
+                    },
+                    {
+                        "filters": 16,
+                        "kernel": 3,
+                        "pool": 1
+                    },
+                    {
+                        "filters": 16,
+                        "kernel": 3,
+                        "pool": 1
+                    },
+                    {
+                        "filters": 48,
+                        "kernel": 3,
+                        "pool": 2
+                    },
+                    {
+                        "filters": 32,
+                        "kernel": 3,
+                        "pool": 2
+                    },
+                    {
+                        "filters": 32,
+                        "kernel": 3,
+                        "pool": 2
+                    }
+                ]
+            }
+        },
+        {
+            "generation": 4,
+            "accuracy": 0.9883999824523926,
+            "fitness": 0.9425499824523926,
+            "params": 45850,
+            "genome": {
+                "dense": 64,
+                "dropout": 0.4,
+                "stages": [
+                    {
+                        "filters": 64,
+                        "kernel": 3,
+                        "pool": 2
+                    },
+                    {
+                        "filters": 16,
+                        "kernel": 3,
+                        "pool": 1
+                    },
+                    {
+                        "filters": 16,
+                        "kernel": 3,
+                        "pool": 1
+                    },
+                    {
+                        "filters": 48,
+                        "kernel": 3,
+                        "pool": 2
+                    },
+                    {
+                        "filters": 32,
+                        "kernel": 3,
+                        "pool": 2
+                    },
+                    {
+                        "filters": 32,
+                        "kernel": 3,
+                        "pool": 2
+                    }
+                ]
+            }
+        }
+    ]
+}

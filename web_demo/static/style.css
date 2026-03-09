@@ -1,0 +1,109 @@
+/* ==============================
+   SECA Dashboard Styles
+   ============================== */
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family: "Segoe UI", Arial, sans-serif;
+    background:#f4f6f9;
+    color:#333;
+}
+
+/* Header */
+
+header{
+    background:#1f2a44;
+    color:white;
+    padding:20px;
+    text-align:center;
+}
+
+header h1{
+    font-size:28px;
+    margin-bottom:5px;
+}
+
+header p{
+    font-size:14px;
+    opacity:0.8;
+}
+
+/* Container */
+
+.container{
+    max-width:1100px;
+    margin:auto;
+    padding:20px;
+}
+
+/* Cards */
+
+.card{
+    background:white;
+    padding:20px;
+    margin-top:20px;
+    border-radius:8px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card h2{
+    margin-bottom:15px;
+}
+
+/* Statistics Section */
+
+.stats{
+    display:flex;
+    flex-wrap:wrap;
+    gap:20px;
+}
+
+.stat-box{
+    flex:1;
+    min-width:150px;
+    background:#eef2f7;
+    padding:15px;
+    border-radius:6px;
+    text-align:center;
+}
+
+.stat-box h3{
+    font-size:22px;
+    margin-bottom:5px;
+}
+
+.stat-box p{
+    font-size:13px;
+    color:#666;
+}
+
+/* Charts */
+
+canvas{
+    margin-top:15px;
+}
+
+/* Architecture box */
+
+.architecture{
+    font-family:monospace;
+    background:#f7f7f7;
+    padding:10px;
+    border-radius:5px;
+    overflow-x:auto;
+}
+
+/* Footer */
+
+footer{
+    text-align:center;
+    margin-top:40px;
+    padding:20px;
+    color:#777;
+    font-size:13px;
+}
